@@ -8,10 +8,14 @@ from telegram.ext import (
     MessageHandler)
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, AIMessage
-from src.Agent import get_agent_executor
+from Agents.Agent import get_agent_executor
 
 
 load_dotenv()
+os.environ["LANGCHAIN_TRACING_V2"]="true"
+os.environ["LANGCHAIN_API_KEY"]=str(os.getenv('LANGSMITH_API_KEY'))
+os.environ["LANGCHAIN_PROJECT"]="MY_DEMO"
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 chat_history = []
 

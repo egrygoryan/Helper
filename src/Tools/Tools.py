@@ -1,9 +1,11 @@
 from langchain.tools import StructuredTool
-from src.WeatherApi import weather_by_city
-from src.TaskApi import run
+from Tools.WeatherApi import weather_by_city
+from Tools.TaskApi import run
+from Tools.JobSearcherApi import search
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import ToolException
 from typing import Optional
+
 
 def _handle_error(error: ToolException) -> str:
     return (
@@ -50,4 +52,21 @@ task_creator = StructuredTool.from_function(
                     If you didn't understand where is the title, where is the description - ask user for clarification""",
     args_schema=TaskInput,
     handle_tool_error = _handle_error
+)
+
+def search_job(position: str, city: str=None):
+    try:
+        return search(position, city)
+    except:
+        raise Exception("The search job tool is not available")
+
+class JobInput(BaseModel):
+    query: str = Field(description="query for job searching")
+    city: Optional[str] = Field(None, description="city in which user is looking for a job")
+
+job_searcher = StructuredTool.from_function(
+    func = search_job,
+    name = "Job_searcher",
+    description="""use it when user looking for job vacancies. 
+                E.g. Give me all vacancies: 'software developer' in city: 'London'"""
 )
